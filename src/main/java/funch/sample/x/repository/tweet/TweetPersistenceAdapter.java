@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -18,17 +19,27 @@ import java.util.UUID;
 class TweetPersistenceAdapter implements LoadTweetPort, WriteTweetPort {
 
     private final TweetRepository tweetRepository;
+    private final UserFollowTweetsRedisRepository userFollowTweetsRedisRepository;
 
     @Override
     public List<TweetDto> getLatestFollowTweets(String followeeId, LocalDateTime fewDayAgo) {
+        userFollowTweetsRedisRepository.findAll();
         XApplication.DB_CALL_COUNT.incrementAndGet();
         return tweetRepository.getLatestFollowTweets(followeeId, fewDayAgo);
     }
 
     @Override
-    public void registerTweet(String userId) {
+    public void registerTweet(String userId, List<String> followerIds) {
         TweetEntity newTweet = new TweetEntity(UUID.randomUUID().toString(), userId, LocalDateTime.now(), userId);
         tweetRepository.save(newTweet);
+        followerIds.forEach(followerId -> {
+            UserFollowTweetsRedisHash userFollowTweetsRedisHash = userFollowTweetsRedisRepository.findById(followerId).orElse(null);
+            if (userFollowTweetsRedisHash == null) {
+                userFollowTweetsRedisHash = new UserFollowTweetsRedisHash(followerId);
+            }
+            userFollowTweetsRedisHash.addTweet(newTweet);
+            userFollowTweetsRedisRepository.save(userFollowTweetsRedisHash);
+        });
     }
 
 }

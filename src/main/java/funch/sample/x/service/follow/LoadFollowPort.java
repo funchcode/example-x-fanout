@@ -9,4 +9,9 @@ public interface LoadFollowPort {
      */
     List<FollowDto> getFollowings(String followeeId);
 
+    /**
+     * 나를 팔로우하는 사람을 조회한다.
+     */
+    List<FollowDto> getFollowers(String followeeId);
+
 }

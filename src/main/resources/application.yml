@@ -8,5 +8,11 @@ spring:
     driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     database: mysql
+  data:
+    redis:
+      repositories:
+        enabled: true
+      host: localhost
+      port: 6379

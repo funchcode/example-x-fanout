@@ -28,4 +28,11 @@ class FollowPersistenceAdapter implements LoadFollowPort {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<FollowDto> getFollowers(String followeeId) {
+        return followRepository.findAllById_FollowerId(followeeId)
+                .stream().map(FollowEntity::toFollowDto)
+                .collect(Collectors.toList());
+    }
+
 }

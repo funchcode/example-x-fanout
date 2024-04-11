@@ -7,5 +7,6 @@ import java.util.List;
 interface FollowRepository extends JpaRepository<FollowEntity, String> {
 
     List<FollowEntity> findAllById_FolloweeId(String followeeId);
+    List<FollowEntity> findAllById_FollowerId(String followeeId);
 
 }
