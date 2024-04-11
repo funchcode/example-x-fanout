@@ -9,8 +9,6 @@ import java.util.List;
 
 public interface TweetRepository extends JpaRepository<TweetEntity, String> {
 
-    List<TweetEntity> findAllByUser_IdAndTimestampAfter(String userId, LocalDateTime after);
-
     /**
      select * from tweet t where t.userId in (select followerId from follow f where f.followeeId = userId) and t.timestamp > after order by t.timestamp desc
      */

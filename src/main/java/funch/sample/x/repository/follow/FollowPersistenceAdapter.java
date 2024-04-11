@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Component
 class FollowPersistenceAdapter implements LoadFollowPort {
+
     private final FollowRepository followRepository;
 
     @Override
@@ -26,4 +27,5 @@ class FollowPersistenceAdapter implements LoadFollowPort {
                 .stream().map(FollowEntity::toFollowDto)
                 .collect(Collectors.toList());
     }
+
 }

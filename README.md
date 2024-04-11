@@ -81,5 +81,25 @@
 
 테스트를 진행하기 위해서는 적절한 샘플 데이터가 필요하다.
 
+#### 샘플 데이터
 
+부하 테스트에 영향을 미치지 않는 아주 간단한 데이터를 세팅했다.  
+
+> 부하의 단위가 DB 읽기 요청으로 판단했기 때문이다.
+
+#### 부하 테스트
+
+부하 테스트는 Apache JMeter로 진행했다.  
+
+> <시나리오>  
+> 사용자가 팔로우의 최근 트윗을 조회하는 API를 호출하면 서버에서는 DB에서 데이터를 가져오며 DB 호출 카운트를 증가시킨다.
+
+Apache JMeter 세팅
+
+1. Thread Group 설정
+   1. 유저 수(Number of Threads): 1000
+   2. 유저 생성시간(Ramp-up period): 1
+   3. Thread 반복(Loop Count): Infinite
+2. HTTP Request Sampler 생성
+3. Summary Report Listener 생성
 

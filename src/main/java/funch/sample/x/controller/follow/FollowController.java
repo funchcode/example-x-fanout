@@ -15,13 +15,15 @@ import java.util.stream.Collectors;
 @RequestMapping("/follows")
 @RestController
 public class FollowController {
+
     private final LoadFollowUseCase loadFollowUseCase;
 
-    @GetMapping("/feeds")
+    @GetMapping("/tweets")
     @ResponseStatus(HttpStatus.OK)
     public List<TweetResponse> getLatestTweets(@RequestParam("userId") String userId) {
         return loadFollowUseCase.getLatestFollowTweets(userId)
                 .stream().map(t -> new TweetResponse(t.getId()))
                 .collect(Collectors.toList());
     }
+
 }
