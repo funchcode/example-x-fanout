@@ -1,5 +1,6 @@
 package funch.sample.x.repository.tweet;
 
+import funch.sample.x.service.tweet.TweetDto;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
@@ -13,32 +14,20 @@ public class UserFollowTweetsRedisHash {
 
     @Id
     private String userId;
-    private List<Tweet> tweets = new ArrayList<>();
+    private List<TweetDto> tweets = new ArrayList<>();
 
     public UserFollowTweetsRedisHash(String userId) {
         this.userId = userId;
     }
 
-    UserFollowTweetsRedisHash addTweet(TweetEntity tweet) {
-        this.tweets.add(new Tweet(tweet.getId(), tweet.getUsername(), tweet.getTimestamp().toString()));
+    UserFollowTweetsRedisHash addTweet(TweetDto tweet) {
+        this.tweets.add(tweet);
         return this;
     }
 
-    UserFollowTweetsRedisHash addTweet(List<TweetEntity> tweets) {
-        this.tweets.addAll(tweets.stream().map(t -> new Tweet(t.getId(), t.getUsername(), t.getTimestamp().toString())).toList());
+    UserFollowTweetsRedisHash addTweet(List<TweetDto> tweets) {
+        this.tweets.addAll(tweets);
         return this;
-    }
-
-    static class Tweet {
-        private final String id;
-        private final String username;
-        private final String timestamp;
-
-        public Tweet(String id, String username, String timestamp) {
-            this.id = id;
-            this.username = username;
-            this.timestamp = timestamp;
-        }
     }
 
 }

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.awt.print.Pageable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -23,13 +24,23 @@ class TweetPersistenceAdapter implements LoadTweetPort, WriteTweetPort {
 
     @Override
     public List<TweetDto> getLatestFollowTweets(String followeeId, LocalDateTime fewDayAgo) {
-        userFollowTweetsRedisRepository.findAll();
-        XApplication.DB_CALL_COUNT.incrementAndGet();
-        return tweetRepository.getLatestFollowTweets(followeeId, fewDayAgo);
+        UserFollowTweetsRedisHash userFollowTweetsRedisHash = userFollowTweetsRedisRepository.findById(followeeId).orElse(null);
+        if (userFollowTweetsRedisHash == null) {
+            XApplication.DB_CALL_COUNT.incrementAndGet();
+            List<TweetDto> tweets = tweetRepository.getLatestFollowTweets(followeeId, fewDayAgo);
+            userFollowTweetsRedisHash = new UserFollowTweetsRedisHash(followeeId);
+            userFollowTweetsRedisHash.addTweet(tweets);
+            userFollowTweetsRedisRepository.save(userFollowTweetsRedisHash);
+            return tweets;
+        } else {
+            return userFollowTweetsRedisHash.getTweets();
+        }
     }
 
     @Override
     public void registerTweet(String userId, List<String> followerIds) {
+        long startNanoTime = System.nanoTime();
+        log.info("[{} user] Time immediately before registration. start nano time -> {}", userId, startNanoTime);
         TweetEntity newTweet = new TweetEntity(UUID.randomUUID().toString(), userId, LocalDateTime.now(), userId);
         tweetRepository.save(newTweet);
         followerIds.forEach(followerId -> {
@@ -37,9 +48,11 @@ class TweetPersistenceAdapter implements LoadTweetPort, WriteTweetPort {
             if (userFollowTweetsRedisHash == null) {
                 userFollowTweetsRedisHash = new UserFollowTweetsRedisHash(followerId);
             }
-            userFollowTweetsRedisHash.addTweet(newTweet);
+            userFollowTweetsRedisHash.addTweet(newTweet.toTweetDto());
             userFollowTweetsRedisRepository.save(userFollowTweetsRedisHash);
         });
+        long endNanoTime = System.nanoTime();
+        log.info("[{} user] Time immediately after registration. start nano time -> {}, end nano time -> {}, running time -> {}", userId, startNanoTime, endNanoTime, endNanoTime - startNanoTime);
     }
 
 }
