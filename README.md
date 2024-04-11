@@ -87,7 +87,7 @@
 
 > 부하의 단위가 DB 읽기 요청으로 판단했기 때문이다.
 
-#### 부하 테스트
+### 부하 테스트
 
 부하 테스트는 Apache JMeter로 진행했다.  
 
@@ -103,3 +103,8 @@ Apache JMeter 세팅
 2. HTTP Request Sampler 생성
 3. Summary Report Listener 생성
 
+### 2차 시스템 구성
+
+메모리 기반의 데이터베이스인 Redis를 도입해서 RDB 읽기 요청 수를 개선한다.
+
+팔로우한 사용자의 최근 트윗을 Redis에 업데이트하는 로직을 추가한다.

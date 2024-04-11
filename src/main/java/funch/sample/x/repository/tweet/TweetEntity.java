@@ -21,8 +21,17 @@ public class TweetEntity {
     @Column(name = "timestamp", nullable = false)
     private LocalDateTime timestamp;
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private UserEntity user;
+    @Column(name = "user_id")
+    private String userId;
+
+    public TweetEntity(String id, String username, LocalDateTime timestamp, String userId) {
+        this.id = id;
+        this.username = username;
+        this.timestamp = timestamp;
+        this.userId = userId;
+    }
 
     public TweetDto toTweetDto() {
         return new TweetDto(this.id, this.username, this.timestamp);

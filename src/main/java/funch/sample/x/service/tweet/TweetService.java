@@ -7,5 +7,13 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-class TweetService implements LoadTweetUseCase {
+class TweetService implements LoadTweetUseCase, WriteTweetUseCase {
+
+    private final WriteTweetPort writeTweetPort;
+
+    @Override
+    public void registerTweet(String userId) {
+        writeTweetPort.registerTweet(userId);
+    }
+
 }
