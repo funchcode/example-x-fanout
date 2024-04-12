@@ -129,3 +129,5 @@ Apache JMeter 세팅
 1000만 건의 샘플 데이터를 생성하는 MariaDB 프로시저를 만들어서 실행했다.
 
 [프로시저 생성 SQL](./SAMPLE.md)
+
+LettuceConnection pipeline 명령 실행 시 5m Timeout 발생

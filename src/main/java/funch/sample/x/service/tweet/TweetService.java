@@ -20,7 +20,7 @@ class TweetService implements LoadTweetUseCase, WriteTweetUseCase {
     @Override
     public void registerTweet(String userId) {
         List<FollowDto> followers = loadFollowPort.getFollowers(userId);
-        writeTweetPort.registerTweet(userId, followers.stream().map(FollowDto::getFollowerId).collect(Collectors.toList()));
+        writeTweetPort.registerTweet(userId, followers.stream().map(FollowDto::getFolloweeId).collect(Collectors.toSet()));
     }
 
 }

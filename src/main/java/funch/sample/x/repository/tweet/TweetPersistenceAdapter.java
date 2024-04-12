@@ -10,9 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.awt.print.Pageable;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -21,6 +19,7 @@ class TweetPersistenceAdapter implements LoadTweetPort, WriteTweetPort {
 
     private final TweetRepository tweetRepository;
     private final UserFollowTweetsRedisRepository userFollowTweetsRedisRepository;
+    private final UserFollowTweetsRepository userFollowTweetsRepository;
 
     @Override
     public List<TweetDto> getLatestFollowTweets(String followeeId, LocalDateTime fewDayAgo) {
@@ -38,19 +37,34 @@ class TweetPersistenceAdapter implements LoadTweetPort, WriteTweetPort {
     }
 
     @Override
-    public void registerTweet(String userId, List<String> followerIds) {
+    public void registerTweet(String userId, Set<String> followerIds) {
         long startNanoTime = System.nanoTime();
         log.info("[{} user] Time immediately before registration. start nano time -> {}", userId, startNanoTime);
         TweetEntity newTweet = new TweetEntity(UUID.randomUUID().toString(), userId, LocalDateTime.now(), userId);
         tweetRepository.save(newTweet);
-        followerIds.forEach(followerId -> {
-            UserFollowTweetsRedisHash userFollowTweetsRedisHash = userFollowTweetsRedisRepository.findById(followerId).orElse(null);
-            if (userFollowTweetsRedisHash == null) {
-                userFollowTweetsRedisHash = new UserFollowTweetsRedisHash(followerId);
-            }
-            userFollowTweetsRedisHash.addTweet(newTweet.toTweetDto());
-            userFollowTweetsRedisRepository.save(userFollowTweetsRedisHash);
-        });
+        List<UserFollowTweetsRedisHash> userFollowTweetsRedisHashes = new ArrayList<>();
+        userFollowTweetsRepository.findAllUserFollowTweets(followerIds);
+//        userFollowTweetsRedisRepository.findAllById(followerIds).spliterator().forEachRemaining(existRedisHash -> {
+//            existRedisHash.addTweet(newTweet.toTweetDto());
+//            userFollowTweetsRedisHashes.add(existRedisHash);
+//            followerIds.remove(existRedisHash.getUserId());
+//        });
+//        followerIds.forEach(remainingFollowerId -> {
+//            UserFollowTweetsRedisHash newUserFollowTweetsRedisHash = new UserFollowTweetsRedisHash(remainingFollowerId);
+//            newUserFollowTweetsRedisHash.addTweet(newTweet.toTweetDto());
+//            userFollowTweetsRedisHashes.add(newUserFollowTweetsRedisHash);
+//        });
+//        if (!userFollowTweetsRedisHashes.isEmpty()) {
+//            userFollowTweetsRedisRepository.saveAll(userFollowTweetsRedisHashes);
+//        }
+//        followerIds.forEach(followerId -> {
+//            UserFollowTweetsRedisHash userFollowTweetsRedisHash = userFollowTweetsRedisRepository.findById(followerId).orElse(null);
+//            if (userFollowTweetsRedisHash == null) {
+//                userFollowTweetsRedisHash = new UserFollowTweetsRedisHash(followerId);
+//            }
+//            userFollowTweetsRedisHash.addTweet(newTweet.toTweetDto());
+//            userFollowTweetsRedisRepository.save(userFollowTweetsRedisHash);
+//        });
         long endNanoTime = System.nanoTime();
         log.info("[{} user] Time immediately after registration. start nano time -> {}, end nano time -> {}, running time -> {}", userId, startNanoTime, endNanoTime, endNanoTime - startNanoTime);
     }
